@@ -193,33 +193,60 @@ class TestLogin:
             self.driver.save_screenshot(".\\screenshots\\" + "test_login.png")
             assert False
 
-ini file
-basically we need to place all constants/common data in inifile (e.g config.ini)
-This is not for test data, only for common data for most of the test cases
+## 🛠️ Configuration with INI File
 
-just provide key and value like below
-e.g. baseURL = https://admin-demo.nopcommerce.com/
-readProperties.py - It reads data from inifile and provide data to test case
-// create a config object 
-config = configParser.RawCofigParser()
-config.read("File Path")
+All constants and common data (not test data) used across most test cases should be placed in an **INI file** (e.g., `config.ini`).  
+Example entry in `config.ini`:
+```
+baseURL = https://admin-demo.nopcommerce.com/
+```
 
-create for each paramerter create a static method like below
- @staticmethod
+### 📖 Reading Configuration with `readProperties.py`
+
+- `readProperties.py` reads data from the INI file and provides it to your test cases.
+- Usage example:
+    ```python
+    import configparser
+    # Create a config object
+    config = configparser.RawConfigParser()
+    config.read("File Path")
+    ```
+
+- For each parameter, create a static method, e.g.:
+    ```python
+    @staticmethod
     def getUserEmail():
         return config.get('common info', 'useremail')
+    ```
 
-Now call these methods from test class files by importing ReadConfig class
-e.g. baseURL = ReadConfig.getApplicationURL()
+- In your test class files, call these methods by importing the `ReadConfig` class:
+    ```python
+    baseURL = ReadConfig.getApplicationURL()
+    ```
 
-Add logs to test cases
-create customer logger under utilities - customLogger
-Add below logic and call logger object in test class methods
-@staticmethod
-    def logGen():
-        logging.basicConfig(filename=".\\Logs\\automation.log",
-                            format='%(asctime)s: %(levelname)s: %(message)s',
-                            datefmt='%m%d%Y %I:%M:%S %p')
-        logger = logging.getLogger()
-        logger.setLevel(logging.INFO)
-        return logger
+---
+
+## 📝 Adding Logs to Test Cases
+
+- Create a custom logger under the `utilities` folder, e.g., `customLogger.py`.
+- Add the following logic and call the logger object in your test class methods:
+    ```python
+    import logging
+
+    class LogGen:
+        @staticmethod
+        def logGen():
+            logger = logging.getLogger()
+            fhandler = logging.FileHandler(filename='.\\Logs\\automation.log', mode='a')
+            formatter = logging.Formatter('%(asctime)s- %(name)s- %(levelname)s- %(message)s')
+            fhandler.setFormatter(formatter)
+            logger.addHandler(fhandler)
+            logger.setLevel(logging.INFO)
+            return logger
+    ```
+
+- In your test methods, create and use the logger:
+    ```python
+    logger = LogGen.logGen()
+    logger.info("Your log message here")
+    ```
