@@ -192,3 +192,34 @@ class TestLogin:
         else:
             self.driver.save_screenshot(".\\screenshots\\" + "test_login.png")
             assert False
+
+ini file
+basically we need to place all constants/common data in inifile (e.g config.ini)
+This is not for test data, only for common data for most of the test cases
+
+just provide key and value like below
+e.g. baseURL = https://admin-demo.nopcommerce.com/
+readProperties.py - It reads data from inifile and provide data to test case
+// create a config object 
+config = configParser.RawCofigParser()
+config.read("File Path")
+
+create for each paramerter create a static method like below
+ @staticmethod
+    def getUserEmail():
+        return config.get('common info', 'useremail')
+
+Now call these methods from test class files by importing ReadConfig class
+e.g. baseURL = ReadConfig.getApplicationURL()
+
+Add logs to test cases
+create customer logger under utilities - customLogger
+Add below logic and call logger object in test class methods
+@staticmethod
+    def logGen():
+        logging.basicConfig(filename=".\\Logs\\automation.log",
+                            format='%(asctime)s: %(levelname)s: %(message)s',
+                            datefmt='%m%d%Y %I:%M:%S %p')
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+        return logger
